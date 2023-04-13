@@ -57,7 +57,7 @@ float piControl(int target, int actual, float Kp, float Ki) {     //proportional
 }//Matt
 
 void followLine(LeftMotor motorLeft, RightMotor motorRight) {
-  static float Kp = .1; // even this low there is occasional oscillation
+  static float Kp = .07; // even this low there is occasional oscillation
   static float Ki = 0;
   static int targetADC = 30; // total reflection
 

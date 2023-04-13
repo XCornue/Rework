@@ -24,9 +24,9 @@ Chassis chassis;
 int motorEffort = 400;
 
 // ultrasonic sensor variables
-int position1 = 17; // building 25 degree
+int position1 = 13; // building 25 degree
 int position3 = 16; // building 45 degree
-int position2 = 25; // stop location
+int position2 = 20; // stop location
 int position4 = 7;  // low block
 int position7 = 15; // other side of course end
 
@@ -122,7 +122,7 @@ void setup()
 
 int ultrasonicReturn(Rangefinder rangefinder)
 {
-  int arr[5] = {62, 103, 45, 172, 6};
+  int arr[5];
   int n = 5;
   int min, temp;
   for (int k = 0; k < n - 1; k++)
@@ -149,117 +149,310 @@ int ultrasonicReturn(Rangefinder rangefinder)
 
 void loop()
 {
-  // Serial.println(ultrasonicReturn(rangefinder));
-  /*Serial.print("Right Reading Is: ");
-  Serial.println(analogRead(20));
-  Serial.print("Left Reading Is: ");
-  Serial.println(analogRead(21));
-  delay(500);  */
-  // Serial.println(code);
   switch (code)
   {
   case remote1:                        // Open non-continuous servo when button 1 is pressed
-    followLine(motorLeft, motorRight); // since the robot is backwards, send in left and right flipped
-    if (decoder.getKeyCode() == remote2)
-    {
-      code = remote2;
-    }
-    if (intersectionDetected(25))
+    followLine(motorLeft, motorRight); // follows the line using p control
+    ultrasonicReading = ultrasonicReturn(rangefinder);
+    Serial.println(ultrasonicReading); // since the robot is backwards, send in left and right flipped
+    if (decoder.getKeyCode() == remoteStopMode)
     {
       motorLeft.setMotorEffort(0);
       motorRight.setMotorEffort(0);
-      code = remote2;
-      Serial.println("Place 4");
+      code = 1000;
     }
-    else
+    else if (ultrasonicReading <= position2)
     {
-      code = remote1;
+      motorLeft.setMotorEffort(0);
+      motorRight.setMotorEffort(0);
+      motor.moveTo(fourtyFive);
+      code = 1000;
     }
-    Serial.println("Place 6");
-    Serial.println(code);
     break;
-  case remote2: // Close non-continuous servo when button 2 is pressed
-    Serial.println("Place 5");
-    motorLeft.setMotorEffort(0);
-    motorRight.setMotorEffort(0);
-    code = 1000;
+  case remote2:                        // Close non-continuous servo when button 2 is pressed
+    followLine(motorLeft, motorRight); // follows the line using p control
+    ultrasonicReading = ultrasonicReturn(rangefinder);
+    Serial.println(ultrasonicReading); // since the robot is backwards, send in left and right flipped
+    if (decoder.getKeyCode() == remoteStopMode)
+    {
+      motorLeft.setMotorEffort(0);
+      motorRight.setMotorEffort(0);
+      code = 1000;
+    }
+    else if (ultrasonicReading <= position2)
+    {
+      motorLeft.setMotorEffort(0);
+      motorRight.setMotorEffort(0);
+      motor.moveTo(twentyFive);
+      code = 1000;
+    }
     break;
   case remote3:
-    motorLeft.setMotorEffort(0);
-    motorRight.setMotorEffort(-100);
-    break;
-  case remote4:
-    moveUntilLine(motorLeft, motorRight);
-    if (moveUntilLine(motorLeft, motorRight))
+    followLine(motorLeft, motorRight); // follows the line using p control
+    ultrasonicReading = ultrasonicReturn(rangefinder);
+    Serial.println(ultrasonicReading);
+    ; // since the robot is backwards, send in left and right flipped
+    if (decoder.getKeyCode() == remoteStopMode)
     {
-      Serial.println("Here");
       motorLeft.setMotorEffort(0);
       motorRight.setMotorEffort(0);
-      code = remote2;
+      code = 1000;
     }
-    if (decoder.getKeyCode() == remote2)
+    else if (ultrasonicReading <= position1)
     {
-      code = remote2;
+      motorLeft.setMotorEffort(0);
+      motorRight.setMotorEffort(0);
+      code = 1000;
     }
+    break;
+  case remote4:
+    motor.moveTo(clearance);
+    code = 1000;
     break;
   case remote5:
-    turnLeft(750, motorLeft, motorRight);
-    code = remote2;
+    reverseDirection(750, motorLeft, motorRight);
+    code = 1000;
     break;
   case remote6:
-    turnRight(750, motorLeft, motorRight);
-    code = remote2;
+    followLine(motorLeft, motorRight);
+    if (decoder.getKeyCode() == remoteStopMode)
+    {
+      motorLeft.setMotorEffort(0);
+      motorRight.setMotorEffort(0);
+      code = 1000;
+    }
+    else if (intersectionDetected)
+    {
+      motorLeft.setMotorEffort(0);
+      motorRight.setMotorEffort(0);
+      code = 1000;
+    }
     break;
   case remote7:
-    reverseDirection(750, motorLeft, motorRight);
-    code = remote2;
+    turnLeft(750, motorLeft, motorRight);
+    if (decoder.getKeyCode() == remoteStopMode)
+    {
+      motorLeft.setMotorEffort(0);
+      motorRight.setMotorEffort(0);
+      code = 1000;
+    }
     break;
   case remote8:
-    Serial.println(ultrasonicReturn(rangefinder));
-    if (decoder.getKeyCode() == remote2)
+    turnRight(750, motorLeft, motorRight);
+    if (decoder.getKeyCode() == remoteStopMode)
     {
-      code = remote2;
+      motorLeft.setMotorEffort(0);
+      motorRight.setMotorEffort(0);
+      code = 1000;
     }
     break;
-  case remoteStopMode: // Open non-continuous servo when button 1 is pressed
-    motor.moveTo(flat);
-    code = remote2;
+  case remote9:
+    followLine(motorLeft, motorRight); // follows the line using p control
+    ultrasonicReading = ultrasonicReturn(rangefinder);
+    Serial.println(ultrasonicReading); // since the robot is backwards, send in left and right flipped
+    if (decoder.getKeyCode() == remoteStopMode)
+    {
+      motorLeft.setMotorEffort(0);
+      motorRight.setMotorEffort(0);
+      code = 1000;
+    }
+    else if (ultrasonicReading <= position4)
+    {
+      motorLeft.setMotorEffort(0);
+      motorRight.setMotorEffort(0);
+      motor.moveTo(flat);
+      code = 1000;
+    }
     break;
-  case remotePlayPause: // Close non-continuous servo when button 2 is pressed
-    motor.moveTo(twentyFive);
-    code = remote2;
-    break;
-  case remoteVolPlus: // Open continuous servo when button 3 is pressed
-    motor.moveTo(fourtyFive);
-    code = remote2;
-    break;
-  case remoteSetup: // Close continuous servo when button 4 is pressed
-    motor.moveTo(clearance);
-    code = remote2;
-    break;
-  case remoteUp: // Close continuous servo when button 4 is pressed
-    motor.getCount();
-    code = remote2;
-    break;
-  case remoteLeft:
+  case remoteUp:
     open(jawServo);
-    code = remote2;
-    break;
-  case remoteRight:
-    close(jawServo);
-    code = remote2;
+    if (decoder.getKeyCode() == remoteStopMode)
+    {
+      code = 1000;
+    }
+    code = 1000;
     break;
   case remoteDown:
-    Serial.println(analogRead(A0));
-    if (decoder.getKeyCode() == remote2)
+    close(jawServo);
+    if (decoder.getKeyCode() == remoteStopMode)
     {
-      code = remote2;
+      code = 1000;
     }
+    code = 1000;
     break;
+  case remoteLeft:
+    motor.moveTo(flat);
+    if (decoder.getKeyCode() == remoteStopMode)
+    {
+      code = 1000;
+    }
+    code = 1000;
+    break;
+  case remoteRight:
+    motor.moveTo(clearance);
+    if (decoder.getKeyCode() == remoteStopMode)
+    {
+      code = 1000;
+    }
+    code = 1000;
+    break;
+    case remoteEnterSave:
+    followLine(motorLeft, motorRight); // follows the line using p control
+    ultrasonicReading = ultrasonicReturn(rangefinder);
+    Serial.println(ultrasonicReading); // since the robot is backwards, send in left and right flipped
+    if (decoder.getKeyCode() == remoteStopMode)
+    {
+      motorLeft.setMotorEffort(0);
+      motorRight.setMotorEffort(0);
+      code = 1000;
+    }
+    else if (ultrasonicReading <= position1)
+    {
+      motorLeft.setMotorEffort(0);
+      motorRight.setMotorEffort(0);
+      code = 1000;
+    }
   default:
     code = decoder.getKeyCode();
   }
 }
+/*void loop()
+{
+  open(jawServo);
+  delay(2000);
+  close(jawServo);
+  delay(2000);
+  // Serial.println(analogRead(A0));
+  // jawServo.writeMicroseconds(1000);
+  // Serial.println(analogRead(A0));
+  // delay(1000);
+  // Serial.println(analogRead(A0));
+  // //jawServo.writeMicroseconds(1250);
+  // Serial.println(analogRead(A0));
+  // delay(1000);
+  // Serial.println(analogRead(A0));
+}
+/*
+Serial.println(analogRead(A0));
+jawServo.writeMicroseconds(1000);
+Serial.println(analogRead(A0));
+delay(1000);
+Serial.println(analogRead(A0));
+jawServo.writeMicroseconds(1250);
+Serial.println(analogRead(A0));
+delay(1000);
+Serial.println(analogRead(A0));
+// Serial.println(ultrasonicReturn(rangefinder));
+/*Serial.print("Right Reading Is: ");
+Serial.println(analogRead(20));
+Serial.print("Left Reading Is: ");
+Serial.println(analogRead(21));
+delay(500);  */
+// Serial.println(code);
+/*switch (code)
+{
+case remote1:                        // Open non-continuous servo when button 1 is pressed
+  followLine(motorLeft, motorRight); // since the robot is backwards, send in left and right flipped
+  if (decoder.getKeyCode() == remote2)
+  {
+    code = remote2;
+  }
+  if (intersectionDetected(25))
+  {
+    motorLeft.setMotorEffort(0);
+    motorRight.setMotorEffort(0);
+    code = remote2;
+    Serial.println("Place 4");
+  }
+  else
+  {
+    code = remote1;
+  }
+  Serial.println("Place 6");
+  Serial.println(code);
+  break;
+case remote2: // Close non-continuous servo when button 2 is pressed
+  Serial.println("Place 5");
+  motorLeft.setMotorEffort(0);
+  motorRight.setMotorEffort(0);
+  code = 1000;
+  break;
+case remote3:
+  motorLeft.setMotorEffort(0);
+  motorRight.setMotorEffort(-100);
+  break;
+case remote4:
+  moveUntilLine(motorLeft, motorRight);
+  if (moveUntilLine(motorLeft, motorRight))
+  {
+    Serial.println("Here");
+    motorLeft.setMotorEffort(0);
+    motorRight.setMotorEffort(0);
+    code = remote2;
+  }
+  if (decoder.getKeyCode() == remote2)
+  {
+    code = remote2;
+  }
+  break;
+case remote5:
+  turnLeft(750, motorLeft, motorRight);
+  code = remote2;
+  break;
+case remote6:
+  turnRight(750, motorLeft, motorRight);
+  code = remote2;
+  break;
+case remote7:
+  reverseDirection(750, motorLeft, motorRight);
+  code = remote2;
+  break;
+case remote8:
+  Serial.println(ultrasonicReturn(rangefinder));
+  if (decoder.getKeyCode() == remote2)
+  {
+    code = remote2;
+  }
+  break;
+case remoteStopMode: // Open non-continuous servo when button 1 is pressed
+  motor.moveTo(flat);
+  code = remote2;
+  break;
+case remotePlayPause: // Close non-continuous servo when button 2 is pressed
+  motor.moveTo(twentyFive);
+  code = remote2;
+  break;
+case remoteVolPlus: // Open continuous servo when button 3 is pressed
+  motor.moveTo(fourtyFive);
+  code = remote2;
+  break;
+case remoteSetup: // Close continuous servo when button 4 is pressed
+  motor.moveTo(clearance);
+  code = remote2;
+  break;
+case remoteUp: // Close continuous servo when button 4 is pressed
+  motor.getCount();
+  code = remote2;
+  break;
+case remoteLeft:
+  open(jawServo);
+  code = remote2;
+  break;
+case remoteRight:
+  close(jawServo);
+  code = remote2;
+  break;
+case remoteDown:
+  Serial.println(analogRead(A0));
+  if (decoder.getKeyCode() == remote2)
+  {
+    code = remote2;
+  }
+  break;
+default:
+  code = decoder.getKeyCode();
+}
+}*/
 
 /*void loop(){
    int16_t code = decoder.getKeyCode();
