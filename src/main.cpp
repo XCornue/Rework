@@ -24,9 +24,9 @@ Chassis chassis;
 int motorEffort = 400;
 
 // ultrasonic sensor variables
-int position1 = 13; // building 25 degree
+int position1 = 15; // building 25 degree
 int position3 = 16; // building 45 degree
-int position2 = 20; // stop location
+int position2 = 27; // stop location
 int position4 = 7;  // low block
 int position7 = 15; // other side of course end
 
@@ -149,6 +149,7 @@ int ultrasonicReturn(Rangefinder rangefinder)
 
 void loop()
 {
+  Serial.println(code);
   switch (code)
   {
   case remote1:                        // Open non-continuous servo when button 1 is pressed
@@ -312,6 +313,16 @@ void loop()
       motorRight.setMotorEffort(0);
       code = 1000;
     }
+    case remoteSetup:
+    ultrasonicReading = ultrasonicReturn(rangefinder);
+    Serial.println(ultrasonicReading);
+    if (decoder.getKeyCode() == remoteStopMode)
+    {
+      motorLeft.setMotorEffort(0);
+      motorRight.setMotorEffort(0);
+      code = 1000;
+    }
+    break;
   default:
     code = decoder.getKeyCode();
   }
