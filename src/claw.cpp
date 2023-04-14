@@ -6,13 +6,13 @@
 
 //Variables FIX VALUES!!!!
 float servoClosed = 1000; //1250; //Length of Pulse in Microseconds for closing
-float servoOpen = 1400; //750; //Length of Pulse in Microseconds for opening
+float servoOpen = 1500; //750; //Length of Pulse in Microseconds for opening
 float servoClosedContinuous = 2000; //2000; //Length of Pulse in Microseconds for closing
 float servoOpenContinuous = 500; //500; //Length of Pulse in Microseconds for opening
 int doubleprevPositionVoltADC = -2;
 int prevPositionVoltADC = -1; //Whatever the ADC's previous value was
 int linPositionVoltADC = 1000; //Whatever the ADC value is currently
-int servoClosedVoltADC = 216; //Whatever the ADC value is for when it is closed
+int servoClosedVoltADC = 200; //Whatever the ADC value is for when it is closed
 int prevPositionContinuous = -2;
 int linPositionContinuous = -1;
 

@@ -32,7 +32,7 @@ int position7 = 15; // other side of course end
 
 // where we want the blue motor
 int clearance = 2000;
-int twentyFive = 1000;
+int twentyFive = 1100;
 int fourtyFive = 816;
 int flat = 0;
 
@@ -128,7 +128,6 @@ int ultrasonicReturn(Rangefinder rangefinder)
   for (int k = 0; k < n - 1; k++)
   {
     arr[k] = rangefinder.getDistance();
-    delay(100);
   }
   for (int i = 0; i < n - 1; i++)
   {
@@ -144,6 +143,11 @@ int ultrasonicReturn(Rangefinder rangefinder)
       }
     }
   }
+  Serial.println(arr[0]);
+  Serial.println(arr[1]);
+  Serial.println(arr[2]);
+  Serial.println(arr[3]);
+  Serial.println(arr[4]);
   return arr[2];
 }
 
@@ -192,7 +196,7 @@ void loop()
     followLine(motorLeft, motorRight); // follows the line using p control
     ultrasonicReading = ultrasonicReturn(rangefinder);
     Serial.println(ultrasonicReading);
-    ; // since the robot is backwards, send in left and right flipped
+    // since the robot is backwards, send in left and right flipped
     if (decoder.getKeyCode() == remoteStopMode)
     {
       motorLeft.setMotorEffort(0);
@@ -212,7 +216,7 @@ void loop()
     break;
   case remote5:
     reverseDirection(750, motorLeft, motorRight);
-    code = 1000;
+    code = 12;
     break;
   case remote6:
     followLine(motorLeft, motorRight);
@@ -231,21 +235,11 @@ void loop()
     break;
   case remote7:
     turnLeft(750, motorLeft, motorRight);
-    if (decoder.getKeyCode() == remoteStopMode)
-    {
-      motorLeft.setMotorEffort(0);
-      motorRight.setMotorEffort(0);
-      code = 1000;
-    }
+    code = 12;
     break;
   case remote8:
     turnRight(750, motorLeft, motorRight);
-    if (decoder.getKeyCode() == remoteStopMode)
-    {
-      motorLeft.setMotorEffort(0);
-      motorRight.setMotorEffort(0);
-      code = 1000;
-    }
+    code = 12;
     break;
   case remote9:
     followLine(motorLeft, motorRight); // follows the line using p control
@@ -297,7 +291,7 @@ void loop()
     }
     code = 1000;
     break;
-    case remoteEnterSave:
+  case remoteEnterSave:
     followLine(motorLeft, motorRight); // follows the line using p control
     ultrasonicReading = ultrasonicReturn(rangefinder);
     Serial.println(ultrasonicReading); // since the robot is backwards, send in left and right flipped
@@ -313,15 +307,33 @@ void loop()
       motorRight.setMotorEffort(0);
       code = 1000;
     }
-    case remoteSetup:
+    break;
+  case remoteSetup:
     ultrasonicReading = ultrasonicReturn(rangefinder);
     Serial.println(ultrasonicReading);
+    delay(10000);
     if (decoder.getKeyCode() == remoteStopMode)
     {
       motorLeft.setMotorEffort(0);
       motorRight.setMotorEffort(0);
       code = 1000;
     }
+    break;
+  case 12:
+    motorLeft.setMotorEffort(0);
+    motorRight.setMotorEffort(0);
+    code = 1000;
+    break;
+  case remotePlayPause:
+    Serial.println(analogRead(A0));
+    jawServo.writeMicroseconds(1000);
+    Serial.println(analogRead(A0));
+    delay(1000);
+    Serial.println(analogRead(A0));
+    jawServo.writeMicroseconds(1250);
+    Serial.println(analogRead(A0));
+    delay(1000);
+    Serial.println(analogRead(A0));
     break;
   default:
     code = decoder.getKeyCode();
@@ -343,18 +355,8 @@ void loop()
   // delay(1000);
   // Serial.println(analogRead(A0));
 }
-/*
-Serial.println(analogRead(A0));
-jawServo.writeMicroseconds(1000);
-Serial.println(analogRead(A0));
-delay(1000);
-Serial.println(analogRead(A0));
-jawServo.writeMicroseconds(1250);
-Serial.println(analogRead(A0));
-delay(1000);
-Serial.println(analogRead(A0));
 // Serial.println(ultrasonicReturn(rangefinder));
-/*Serial.print("Right Reading Is: ");
+Serial.print("Right Reading Is: ");
 Serial.println(analogRead(20));
 Serial.print("Left Reading Is: ");
 Serial.println(analogRead(21));
